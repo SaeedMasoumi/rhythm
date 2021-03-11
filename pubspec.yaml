@@ -1,0 +1,28 @@
+name: rhythm
+description: An audio processing plugin for Flutter
+version: 1.0.0
+author: Saeed Masoumi
+homepage: https://github.com/SaeedMasoumi/Rhythm
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=1.20.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  permission_handler: ^6.0.1+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  effective_dart: ^1.3.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: io.saeid.rhythm
+        pluginClass: RhythmPlugin
+      ios:
+        pluginClass: RhythmPlugin
