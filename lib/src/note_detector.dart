@@ -10,7 +10,7 @@ class NoteDetector {
               .frequency(_referenceFrequency)
               .compareTo(b.frequency(_referenceFrequency)));
 
-  final int _minSamples = 10;
+  final int _minSamples = 15;
   double _referenceFrequency;
   List<Note> _sortedTuningNotes;
   StreamController<PitchResult> _controller = StreamController.broadcast();
@@ -50,26 +50,20 @@ class NoteDetector {
   PitchResult? _calculateAverageDiff() {
     List<PitchResult> filteredSamples = _findMostFrequentList();
     Note mostFrequentNote = filteredSamples.first.note;
-    double deviationSum = 0;
-    int sameNoteCount = 0;
-    for (var sample in filteredSamples) {
-      deviationSum += sample.deviation;
-      sameNoteCount++;
-    }
 
-    if (sameNoteCount > 0) {
-      double averageDeviation = deviationSum / sameNoteCount;
+    if (filteredSamples.isEmpty) return null;
 
-      return PitchResult(mostFrequentNote,
-          mostFrequentNote.frequency(_referenceFrequency), averageDeviation);
-    }
-
-    return null;
+    double averageDeviation =
+        filteredSamples.map((e) => e.deviation).reduce((a, b) => a + b) /
+            filteredSamples.length;
+    double averagePitch =
+        filteredSamples.map((e) => e.pitch).reduce((a, b) => a + b) /
+            filteredSamples.length;
+    return PitchResult(mostFrequentNote, averagePitch, averageDeviation);
   }
 
   List<PitchResult> _findMostFrequentList() {
     var occurrenceMap = Map<PitchResult, int>();
-    List<PitchResult> mostPopularValues = [];
 
     _samples.forEach((element) {
       if (!occurrenceMap.containsKey(element)) {
@@ -81,6 +75,8 @@ class NoteDetector {
 
     List<int> sortedValues = occurrenceMap.values.toList()..sort();
     int popularValue = sortedValues.last;
+    List<PitchResult> mostPopularValues = [];
+
     occurrenceMap.forEach((k, v) {
       if (v == popularValue) {
         mostPopularValues.add(k);
